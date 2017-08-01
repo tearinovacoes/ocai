@@ -3,17 +3,6 @@
 <?php
     $f = new Formr('bootstrap');
 
-    $dbopts = parse_url(getenv("DATABASE_URL"));
-
-    $host = $dbopts["host"];
-    $user = $dbopts["user"];
-    $dbname = ltrim($dbopts["path"],'/');
-    $pass = $dbopts["pass"];
-    $port = $dbopts["port"];
-
-    //ORM::configure('pgsql:port='.$port.' sslmode=require host='.$host.' user='.$user.' dbname='.$dbname.' password='.$pass);
-    ORM::configure('pgsql:host=ec2-50-19-95-47.compute-1.amazonaws.com port=5432 user=xqfnneqhrsszvg dbname=ddojpsdo74cjbu password=e21a11fa837eab9adc6270c5037796956242527b4b27a911da7fc67fcdb8eaad');
-
     $items = Model::factory('Item')
         ->find_many();
 

@@ -1,6 +1,7 @@
 <?php
 require("vendor/autoload.php");
-    $dbopts = parse_url(getenv("DATABASE_URL"));
+	
+	$dbopts = parse_url(getenv("DATABASE_URL"));
 
     $host = $dbopts["host"];
     $user = $dbopts["user"];
