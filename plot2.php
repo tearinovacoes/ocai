@@ -76,7 +76,7 @@ EOT;
 	
 	</head>
 	<body>
-
+		<div>aqui</div>
 		<div class="radarChart"></div>
 
 		<script src="js/radarchart.js"></script>	
@@ -89,8 +89,8 @@ EOT;
 			////////////////////////////////////////////////////////////// 
 
 			var margin = {top: 100, right: 100, bottom: 100, left: 100},
-				width = 400; //Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
-				height = 400; //Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+				width = 200; //Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
+				height = 200; //Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 					
 			////////////////////////////////////////////////////////////// 
 			////////////////////////// Data ////////////////////////////// 
@@ -134,7 +134,6 @@ EOT;
 			//Call function to draw the Radar chart
 			RadarChart(".radarChart", data, radarChartOptions);
 		</script>
-		<h1 style="float: left;">aqui</h1>
-
+		<div>aqui</div>
 	</body>
 </html>

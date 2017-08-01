@@ -35,7 +35,7 @@ function RadarChart(id, data, options) {
 	var allAxis = (data[0].map(function(i, j){return i.axis})),	//Names of each axis
 		total = allAxis.length,					//The number of different axes
 		radius = Math.min(cfg.w/2, cfg.h/2), 	//Radius of the outermost circle
-		Format = d3.format('%'),			 	//Percentage formatting
+		Format = d3.format('0r'),			 	//Percentage formatting
 		angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
 	
 	//Scale for the radius
@@ -59,6 +59,8 @@ function RadarChart(id, data, options) {
 	var g = svg.append("g")
 			.attr("transform", "translate(" + (cfg.w/2 + cfg.margin.left) + "," + (cfg.h/2 + cfg.margin.top) + ")");
 	
+
+
 	/////////////////////////////////////////////////////////
 	////////// Glow filter for some extra pizzazz ///////////
 	/////////////////////////////////////////////////////////
@@ -236,6 +238,10 @@ function RadarChart(id, data, options) {
 	var tooltip = g.append("text")
 		.attr("class", "tooltip")
 		.style("opacity", 0);
+	
+
+	//g.attr("transform","translate("+(cfg.w/2)+","+(cfg.h/2)+")");
+	//g.attr("transform","rotate(45)");
 	
 	/////////////////////////////////////////////////////////
 	/////////////////// Helper Function /////////////////////

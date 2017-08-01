@@ -10,7 +10,8 @@ require("vendor/autoload.php");
     $port = $dbopts["port"];
 
     ORM::configure('pgsql:port='.$port.' sslmode=require host='.$host.' user='.$user.' dbname='.$dbname.' password='.$pass);
-
+	//ORM::configure("pgsql:dbname=ocai host=localhost port=5432 user=postgres password=1q2w3e sslmode=require");
+	
 class Item extends Model {}
 class Subitem extends Model {}
 class Response extends Model {
