@@ -1,6 +1,14 @@
 <?php
 require("vendor/autoload.php");
-ORM::configure("pgsql:dbname=ddojpsdo74cjbu host=ec2-50-19-95-47.compute-1.amazonaws.com port=5432 user=eywxrrahqgwtff password=91459b0e009d4bde6ead7a6b82ff40f5f99b2de9e385e332fad9c83eb6446ae1 sslmode=require");
+    $dbopts = parse_url(getenv("DATABASE_URL"));
+
+    $host = $dbopts["host"];
+    $user = $dbopts["user"];
+    $dbname = ltrim($dbopts["path"],'/');
+    $pass = $dbopts["pass"];
+    $port = $dbopts["port"];
+
+    ORM::configure('pgsql:port='.$port.' sslmode=require host='.$host.' user='.$user.' dbname='.$dbname.' password='.$pass);
 
 class Item extends Model {}
 class Subitem extends Model {}
