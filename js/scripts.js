@@ -78,7 +78,7 @@ var app = {
             $("#btnEnviar").prop("disabled", true);
         } else {
             $("#points_left_" + what + "_" + item_id).attr("class", "");
-            $("#btnEnviar").prop("disabled", false);
+            $("#btnEnviar").prop("disabled", true);
         }
 		if (val == 0){
             $("#points_left_" + what + "_" + item_id).attr("class", "").addClass("number-zero");

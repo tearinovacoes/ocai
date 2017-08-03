@@ -8,13 +8,14 @@
 	
 	$str=<<<EOT
 		select 
-			subitem.org_culture as org_culture,
-			round(avg(response.subitem_actual),0) as average_actual,
-			round(avg(response.subitem_desirable),0) as average_desirable
+			subitem.org_culture as org_culture
+			,sum(response.subitem_actual)/((select cast(count(distinct response_uid) as float) from response)*$dimensoes)/100 as average_actual
+			,sum(response.subitem_desirable)/((select cast(count(distinct response_uid) as float) from response)*$dimensoes)/100 as average_desirable
 		from 
 			response
-		inner join
-			subitem on response.subitem_id=subitem.subitem_id
+			,subitem 
+		where 
+			response.subitem_id=subitem.subitem_id
 		group by 
 			subitem.org_culture
 		order by org_culture asc;
@@ -23,7 +24,7 @@ EOT;
 	$result = ORM::for_table('response')->raw_query($str)->find_many();
 	
 	$plot=array();
-	$culture=array("C","A","M","H");
+	$culture=array("Clan","Adhocracy","Market","Hierarchy");
 	$cont=0;
 	
 	foreach($result as $item){
@@ -76,7 +77,11 @@ EOT;
 	
 	</head>
 	<body>
-
+		<table  align='center' style='width: 800px;'>
+			<tr>
+				<td colspan="3"><h1 style='padding-top: 10px; height: 40px; background-color: #eee; text-align:center;'>RESULTADO</h1>
+			</tr>
+		</table>
 		<div class="radarChart"></div>
 
 		<script src="js/radarchart.js"></script>	
@@ -89,8 +94,8 @@ EOT;
 			////////////////////////////////////////////////////////////// 
 
 			var margin = {top: 100, right: 100, bottom: 100, left: 100},
-				width = 400; //Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
-				height = 400; //Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+				width = Math.min(800, window.innerWidth - 10) - margin.left - margin.right,
+				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 					
 			////////////////////////////////////////////////////////////// 
 			////////////////////////// Data ////////////////////////////// 
@@ -120,21 +125,147 @@ EOT;
 			////////////////////////////////////////////////////////////// 
 
 			var color = d3.scale.ordinal()
-				.range(["#EDC951","#CC333F","#00A0B0","#00A000"]);
+				.range(["#EDC951","#CC333F"]);
 				
 			var radarChartOptions = {
 			  w: width,
 			  h: height,
 			  margin: margin,
-			  maxValue: 100,
-			  levels: 10,
+			  maxValue: 1,
+			  levels: 5,
 			  roundStrokes: true,
 			  color: color
 			};
 			//Call function to draw the Radar chart
 			RadarChart(".radarChart", data, radarChartOptions);
 		</script>
-		<h1 style="float: left;">aqui</h1>
+		
+		<div align='center'>
+			<p align='center' style='font-size: 12px;'>Legenda:</p><strong>Amarelo:</strong> Atual / <strong>Vermelho:</strong> Desejável</br></p>
+		</div>
+		
+		</br>
+		</br>
+		
+		<table  align='center' style='width: 800px;'>
+			<tr>
+				<td colspan="3"><h1 style='padding-top: 10px; height: 40px; background-color: #eee; text-align:center;'>DEFINIÇÕES DE CADA DIMENSÃO</h1>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<h2 style='text-align:left;'>CLAN</h2>
+					<p style='text-align:justify;'>
+						A organização da escola é muito pessoal, como uma segunda família. As pessoas compartilham diversos aspectos de sua vida.
+						A liderança da escola tem como funções orientar, facilitar e desenvolver os demais membros.
+						O estilo de direção é caracterizado por trabalho em equipe, consenso e participação.
+						O que mantém a escola unida é lealdade e confiança. O comprometimento entre seus membros é alto.
+						A escola enfatiza o desenvolvimento humano. Confiança, abertura e participação persistem.
+						A escola atua com base em desenvolvimento humano, trabalho em equipe e comprometimento.
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td style='width: 25%;'>
+					<h2 style='text-align:left;'>HIERARCHY</h2>
+					<p style='text-align:justify;'>
+						A escola atua com base em sua eficiência formal. Entregas e produção são importantes.
+						O que mantém a escola unida são regras formais e políticas.
+						A escola enfatiza permanência e estabilidade. Eficiência, controle e operações padronizadas são importantes.
+						O estilo de direção é caracterizado por segurança, conformidade, previsibilidade e estabilidade nas relações da equipe.
+						A escola é um lugar bem estruturado e formal. Procedimentos formais governam o modo das pessoas agirem.
+						A liderança é voltada para coordenar, organizar e tornar a estrutura da escola mais eficiente.
+					</p>
+				</td>
+				<td><div class="radarChart1"></div></td>
+				<td style='width: 25%;'>
+					<h2 style='text-align:left;'>ADHOCRACY</h2>
+					<p style='text-align:justify;'>
+						A escola atua com base em processos e resultados, que são diferenciados.
+						O que mantém a escola unida é inovação e desenvolvimento. Há a motivação de estar em evidência.
+						A liderança é voltada para o empreendedorismo e a inovação. Geralmente assume muitos riscos.
+						A escola é dinâmica e empreendedora. As pessoas costumam estar dispostas a assumir riscos.
+						O estilo de direção é caracterizado por assumir riscos e oferecer liberdade de criar.
+						A escola enfatiza adquirir novos recursos e criar novos desafios, além de aproveitar novas oportunidades.
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<h2 style='text-align:left;'>MARKET</h2>
+					<p style='text-align:justify;'>
+						O estilo de direção é caracterizado por competitividade, alta demanda e cumprimento de metas.
+						A escola enfatiza ações competitivas e conquistas individuais.
+						A escola é voltada para resultados. A maior preocupação é resolver as tarefas. As pessoas são competitivas e orientadas ao desempenho.
+						A escola atua com base em sua posição no sistema. Competitividade é a dimensão chave.
+						O que mantém a escola unida é ênfase em resultados e alcance de metas.
+						O principal foco da liderança da escola são os resultados.
+					</p>
+				</td>
+			</tr>
+		</table>
+		
+		</br>
+		</br>
+		
+		<script src="js/radarchart.js"></script>	
+		<script>
+			var margin = {top: 100, right: 100, bottom: 100, left: 100},
+				width = Math.min(350, window.innerWidth - 10) - margin.left - margin.right,
+				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
+			var radarChartOptions = {
+			  w: width,
+			  h: height,
+			  margin: margin,
+			  maxValue: 0.4,
+			  levels: 5,
+			  roundStrokes: true,
+			  color: color
+			};
+			RadarChart(".radarChart1", data, radarChartOptions);
+		</script>
+		
+	
+		<table  align='center' style='width: 800px;'>
+			<tr>
+				<td colspan="3"><h1 style='padding-top: 10px; height: 40px; background-color: #eee; text-align:center;'>QUADRO DE VALORES COMPETITIVOS</h1>
+			</tr>
+			<tr>
+				<td>
+					<h2 style='text-align:center;'>Flexibility and discretion</h2>
+				</td>
+				<td>
+					<h2 style='background-color: #eee; text-align:center;'>COLABORATE</h2>
+				</td>
+				<td>
+					<h2 style='text-align:center;'>External focus and differentiation</h2>
+				</td>
+			</tr>
+			<tr>
+				<td style='width: 25%;'>
+					<h2 style='background-color: #eee; text-align:center;'>CONTROL</h2>
+				</td>
+				<td><div class="radarChart2"></div></td>
+				<td style='width: 25%;'>
+					<h2 style='background-color: #eee; text-align:center;'>CREATE</h2>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h2 style='text-align:center;'>Internal focus and integration</h2>
+				</td>
+				<td>
+					<h2 style='background-color: #eee; text-align:center;'>COMPETE</h2>
+				</td>
+				<td>
+					<h2 style='text-align:center;'>Stability and control</h2>
+				</td>
+			</tr>
+		</table>
+		
+		<script src="js/radarchart.js"></script>
+		<script>
+			RadarChart(".radarChart2", data, radarChartOptions);
+		</script>		
 	</body>
 </html>
