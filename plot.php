@@ -1,44 +1,10 @@
-<?php require("survey.php"); ?>
+<?php
+  require("db_connect.php");
+	require("lib.php");
 
-<?php 
-	
-	$str="select count(item_id) as dimensoes from item;";
-	$result = ORM::for_table('item')->raw_query($str)->find_one();
-	$dimensoes = $result->dimensoes;
-	
-	$str=<<<EOT
-		select 
-			subitem.org_culture as org_culture
-			,sum(response.subitem_actual)/((select cast(count(distinct response_uid) as float) from response)*$dimensoes)/100 as average_actual
-			,sum(response.subitem_desirable)/((select cast(count(distinct response_uid) as float) from response)*$dimensoes)/100 as average_desirable
-		from 
-			response
-			,subitem 
-		where 
-			response.subitem_id=subitem.subitem_id
-		group by 
-			subitem.org_culture
-		order by org_culture asc;
-EOT;
-	
-	$result = ORM::for_table('response')->raw_query($str)->find_many();
-	
-	$plot=array();
-	$culture=array("Clan","Adhocracy","Market","Hierarchy");
-	$cont=0;
-	
-	foreach($result as $item){
-		$plot[$culture[$cont]]=array("actual"=>$item->average_actual, "desirable"=>$item->average_desirable);
-		$cont++;
-	}
-	
-	//$result
-	
-/*  	echo "<pre>";
-	var_dump ($plot);
-	echo "</pre>";
-	exit();  */
-	
+
+	$plot = getOcaiResults();
+	// print_r($plot);die();
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +19,10 @@ EOT;
 
 		<!-- D3.js -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-		
+
+		<script src="js/radarchart.js"></script>
+		<script src="js/plot.js"></script>
+
 		<style>
 			body {
 				font-family: 'Open Sans', sans-serif;
@@ -64,17 +33,17 @@ EOT;
 				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
 				cursor: default;
 			}
-			
+
 			.legend {
 				font-family: 'Raleway', sans-serif;
 				fill: #333333;
 			}
-			
+
 			.tooltip {
 				fill: #333333;
 			}
 		</style>
-	
+
 	</head>
 	<body>
 		<table  align='center' style='width: 800px;'>
@@ -82,71 +51,73 @@ EOT;
 				<td colspan="3"><h1 style='padding-top: 10px; height: 40px; background-color: #eee; text-align:center;'>RESULTADO</h1>
 			</tr>
 		</table>
-		<div class="radarChart"></div>
+		<div class="radarChart-all"></div>
 
-		<script src="js/radarchart.js"></script>	
 		<script>
-      
-      /* Radar chart design created by Nadieh Bremer - VisualCinnamon.com */
-      
-			////////////////////////////////////////////////////////////// 
-			//////////////////////// Set-Up ////////////////////////////// 
-			////////////////////////////////////////////////////////////// 
-
-			var margin = {top: 100, right: 100, bottom: 100, left: 100},
-				width = Math.min(800, window.innerWidth - 10) - margin.left - margin.right,
-				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
-					
-			////////////////////////////////////////////////////////////// 
-			////////////////////////// Data ////////////////////////////// 
-			////////////////////////////////////////////////////////////// 
+		  var margin = {top: 100, right: 100, bottom: 100, left: 100}
+			width = Math.min(800, window.innerWidth - 10) - margin.left - margin.right,
+			height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
 			var data = [
-					  [//actual
-						<?php foreach($plot as $index=>$value): ?>
-							{axis:"<?=$index;?>",value:<?=$value["actual"];?>},
-						<?php endforeach; ?>
-						//{axis:"A",value:0.70},
-						//{axis:"B",value:0.28},
-						//{axis:"C",value:0.7},
-						//{axis:"D",value:0.17},		
-					  ],[//desirable
-					  	<?php foreach($plot as $index=>$value): ?>
-							{axis:"<?=$index;?>",value:<?=$value["desirable"];?>},
-						<?php endforeach; ?>
-						//{axis:"A",value:0.27},
-						//{axis:"B",value:0.16},
-						//{axis:"C",value:0.35},
-						//{axis:"D",value:0.8},
-					  ]
+						[//actual
+							<?php foreach($plot["all"] as $index=>$value): ?>
+									{axis:"<?= $value["org_culture"] ?>",value:<?=$value["average_actual"];?>},
+							<?php endforeach; ?>
+						],[//desirable
+							<?php foreach($plot["all"] as $index=>$value): ?>
+									{axis:"<?=$value["org_culture"] ?>",value:<?=$value["average_desirable"];?>},
+							<?php endforeach; ?>
+						]
 					];
-			////////////////////////////////////////////////////////////// 
-			//////////////////// Draw the Chart ////////////////////////// 
-			////////////////////////////////////////////////////////////// 
 
-			var color = d3.scale.ordinal()
-				.range(["#EDC951","#CC333F"]);
-				
-			var radarChartOptions = {
-			  w: width,
-			  h: height,
-			  margin: margin,
-			  maxValue: 1,
-			  levels: 5,
-			  roundStrokes: true,
-			  color: color
-			};
-			//Call function to draw the Radar chart
-			RadarChart(".radarChart", data, radarChartOptions);
+			plotRadarChart(".radarChart-all",data,width,height,margin);
 		</script>
-		
+
 		<div align='center'>
 			<p align='center' style='font-size: 12px;'>Legenda:</p><strong>Amarelo:</strong> Atual / <strong>Vermelho:</strong> Desejável</br></p>
 		</div>
-		
+
 		</br>
 		</br>
-		
+
+    <?php foreach($plot["dimensoes"] as $dimensao): ?>
+				<div class="por_dimensao">
+						<div><?= $dimensao["label"] ?></div>
+						<div class="radarChart-all"></div>
+						<div class='<?= "radarChart-".$dimensao["item_id"] ?>'></div>
+							<script>
+								var margin = {top: 20, right: 20, bottom: 20, left: 20}
+								width = 400;
+								height = 400;
+
+
+								<?php
+								    $plot_data = array();
+								    foreach($plot["by_dimension"] as $item) {
+											if($item["item_id"]==$dimensao["item_id"]) {
+												$plot_data[$item["org_culture"]] = $item;
+											}
+										}
+							  ?>
+
+								var data = [
+											[//actual
+												<?php foreach($plot_data as $org_culture=>$value): ?>
+														{axis:"<?=$org_culture ?>",value:<?=$value["average_actual"];?>},
+												<?php endforeach; ?>
+											],[//desirable
+												<?php foreach($plot_data as $index=>$value): ?>
+														{axis:"<?=$org_culture ?>",value:<?=$value["average_desirable"];?>},
+												<?php endforeach; ?>
+											]
+										];
+
+								plotRadarChart('<?= ".radarChart-".$dimensao["item_id"] ?>',data,width,height,margin);
+							</script>
+						</div>
+				</div>
+		<?php endforeach; ?>
+
 		<table  align='center' style='width: 800px;'>
 			<tr>
 				<td colspan="3"><h1 style='padding-top: 10px; height: 40px; background-color: #eee; text-align:center;'>DEFINIÇÕES DE CADA DIMENSÃO</h1>
@@ -203,11 +174,11 @@ EOT;
 				</td>
 			</tr>
 		</table>
-		
+
 		</br>
 		</br>
-		
-		<script src="js/radarchart.js"></script>	
+
+		<script src="js/radarchart.js"></script>
 		<script>
 			var margin = {top: 100, right: 100, bottom: 100, left: 100},
 				width = Math.min(350, window.innerWidth - 10) - margin.left - margin.right,
@@ -224,8 +195,8 @@ EOT;
 			};
 			RadarChart(".radarChart1", data, radarChartOptions);
 		</script>
-		
-	
+
+
 		<table  align='center' style='width: 800px;'>
 			<tr>
 				<td colspan="3"><h1 style='padding-top: 10px; height: 40px; background-color: #eee; text-align:center;'>QUADRO DE VALORES COMPETITIVOS</h1>
@@ -262,10 +233,10 @@ EOT;
 				</td>
 			</tr>
 		</table>
-		
+
 		<script src="js/radarchart.js"></script>
 		<script>
 			RadarChart(".radarChart2", data, radarChartOptions);
-		</script>		
+		</script>
 	</body>
 </html>
