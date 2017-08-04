@@ -58,7 +58,7 @@
 			width = Math.min(800, window.innerWidth - 10) - margin.left - margin.right,
 			height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
-			var data = [
+			var data_all = [
 						[//actual
 							<?php foreach($plot["all"] as $index=>$value): ?>
 									{axis:"<?= $value["org_culture"] ?>",value:<?=$value["average_actual"];?>},
@@ -70,7 +70,7 @@
 						]
 					];
 
-			plotRadarChart(".radarChart-all",data,width,height,margin);
+			plotRadarChart(".radarChart-all",data_all,width,height,margin);
 		</script>
 
 		<div align='center'>
@@ -106,7 +106,7 @@
 														{axis:"<?=$org_culture ?>",value:<?=$value["average_actual"];?>},
 												<?php endforeach; ?>
 											],[//desirable
-												<?php foreach($plot_data as $index=>$value): ?>
+												<?php foreach($plot_data as $org_culture=>$value): ?>
 														{axis:"<?=$org_culture ?>",value:<?=$value["average_desirable"];?>},
 												<?php endforeach; ?>
 											]
@@ -147,7 +147,29 @@
 						A liderança é voltada para coordenar, organizar e tornar a estrutura da escola mais eficiente.
 					</p>
 				</td>
-				<td><div class="radarChart1"></div></td>
+				<td>
+            <div class="radarChart-all3"></div>
+            <script>
+              var margin = {top: 20, right: 20, bottom: 20, left: 20}
+              width = 300,
+              height = 300;
+
+              var data_all = [
+                    [//actual
+                      <?php foreach($plot["all"] as $index=>$value): ?>
+                          {axis:"<?= $value["org_culture"] ?>",value:<?=$value["average_actual"];?>},
+                      <?php endforeach; ?>
+                    ],[//desirable
+                      <?php foreach($plot["all"] as $index=>$value): ?>
+                          {axis:"<?=$value["org_culture"] ?>",value:<?=$value["average_desirable"];?>},
+                      <?php endforeach; ?>
+                    ]
+                  ];
+
+              plotRadarChart(".radarChart-all3",data_all,width,height,margin);
+            </script>
+          </td>
+        </td>
 				<td style='width: 25%;'>
 					<h2 style='text-align:left;'>ADHOCRACY</h2>
 					<p style='text-align:justify;'>
@@ -178,23 +200,7 @@
 		</br>
 		</br>
 
-		<script src="js/radarchart.js"></script>
-		<script>
-			var margin = {top: 100, right: 100, bottom: 100, left: 100},
-				width = Math.min(350, window.innerWidth - 10) - margin.left - margin.right,
-				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
-			var radarChartOptions = {
-			  w: width,
-			  h: height,
-			  margin: margin,
-			  maxValue: 0.4,
-			  levels: 5,
-			  roundStrokes: true,
-			  color: color
-			};
-			RadarChart(".radarChart1", data, radarChartOptions);
-		</script>
 
 
 		<table  align='center' style='width: 800px;'>
@@ -216,7 +222,28 @@
 				<td style='width: 25%;'>
 					<h2 style='background-color: #eee; text-align:center;'>CONTROL</h2>
 				</td>
-				<td><div class="radarChart2"></div></td>
+				<td>
+          <div class="radarChart-all2"></div>
+          <script>
+            var margin = {top: 20, right: 20, bottom: 20, left: 20}
+            width = 300,
+            height = 300;
+
+            var data_all = [
+                  [//actual
+                    <?php foreach($plot["all"] as $index=>$value): ?>
+                        {axis:"<?= $value["org_culture"] ?>",value:<?=$value["average_actual"];?>},
+                    <?php endforeach; ?>
+                  ],[//desirable
+                    <?php foreach($plot["all"] as $index=>$value): ?>
+                        {axis:"<?=$value["org_culture"] ?>",value:<?=$value["average_desirable"];?>},
+                    <?php endforeach; ?>
+                  ]
+                ];
+
+            plotRadarChart(".radarChart-all2",data_all,width,height,margin);
+          </script>
+        </td>
 				<td style='width: 25%;'>
 					<h2 style='background-color: #eee; text-align:center;'>CREATE</h2>
 				</td>
@@ -233,10 +260,5 @@
 				</td>
 			</tr>
 		</table>
-
-		<script src="js/radarchart.js"></script>
-		<script>
-			RadarChart(".radarChart2", data, radarChartOptions);
-		</script>
 	</body>
 </html>
