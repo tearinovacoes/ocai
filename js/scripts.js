@@ -75,10 +75,10 @@ var app = {
         val = new Number(app["points_left_" + what][item_id]);
         if (val < 0) {
             $("#points_left_" + what + "_" + item_id).attr("class", "").addClass("number-negative");
-            $("#btnEnviar").prop("disabled", true);
+            //$("#btnEnviar").prop("disabled", true);
         } else {
             $("#points_left_" + what + "_" + item_id).attr("class", "");
-            $("#btnEnviar").prop("disabled", true);
+            //$("#btnEnviar").prop("disabled", true);
         }
 		if (val == 0){
             $("#points_left_" + what + "_" + item_id).attr("class", "").addClass("number-zero");
