@@ -350,10 +350,10 @@ class Formr {
 		for($i = 1; $i < $length; $i = strlen($string)) {
 			
 			# grap a random character
-			$r = $chars{rand(0, $chars_length)};
+			$r = $chars[rand(0, $chars_length)];
 			
 			# make sure the same characters don't appear next to each other
-			if($r != $string{$i - 1}) $string .= $r;
+			if($r != $string[$i - 1]) $string .= $r;
 		}
 		
 		return $string;
