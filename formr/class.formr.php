@@ -344,7 +344,7 @@ class Formr {
 		$chars_length = (strlen($chars) - 1);
 		
 		# crete our string
-		$string = $chars{rand(0, $chars_length)};
+		$string = $chars[rand(0, $chars_length)];
 		
 		# generate random string
 		for($i = 1; $i < $length; $i = strlen($string)) {
